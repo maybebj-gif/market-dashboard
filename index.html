@@ -238,8 +238,9 @@ function el(tag, attrs, parent) {
 }
 
 function drawGauge(d) {
+  const score = Math.round(d.score);
   const bands = document.getElementById("fng-bands");
-  const active = ratingOf(d.score);
+  const active = ratingOf(score);
   BANDS.forEach(([a, b, name]) => {
     const on = name === active, side = sideOf(name);
     el("path", {
@@ -260,10 +261,10 @@ function drawGauge(d) {
     const [x, y] = pt(v, 80);
     el("text", { x, y: y + 4, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, ticks).textContent = v;
   });
-  const [nx, ny] = pt(d.score, 104);
+  const [nx, ny] = pt(score, 104);
   const needle = document.getElementById("fng-needle");
   needle.setAttribute("x2", nx); needle.setAttribute("y2", ny);
-  document.getElementById("fng-score").textContent = d.score;
+  document.getElementById("fng-score").textContent = score;
   document.getElementById("fng-rating").textContent = `${RATINGS[d.rating] || d.rating}　${d.rating.replace(/\b\w/g, c => c.toUpperCase())}`;
 }
 
@@ -272,8 +273,9 @@ function drawCompare(d) {
     ["前一日收盤", d.previous_close], ["一週前", d.previous_1_week],
     ["一個月前", d.previous_1_month], ["一年前", d.previous_1_year],
   ];
-  document.getElementById("fng-compare").innerHTML = rows.map(([when, v]) => {
-    const r = ratingOf(v), s = sideOf(r);
+  // 跟 CNN 網頁一致：主數字四捨五入，比較值捨去小數
+  document.getElementById("fng-compare").innerHTML = rows.map(([when, raw]) => {
+    const v = Math.floor(raw), r = ratingOf(v), s = sideOf(r);
     return `<li><span class="when">${when}</span><span class="lbl">${RATINGS[r]}</span><span class="val ${s}">${v}</span></li>`;
   }).join("");
 }
