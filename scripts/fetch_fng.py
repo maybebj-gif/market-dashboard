@@ -4,6 +4,7 @@
 讓網頁顯示「尚未更新」而不是整張卡壞掉。
 """
 import json
+import math
 import sys
 import urllib.request
 from datetime import datetime, timezone
@@ -32,6 +33,7 @@ def fetch():
 
 
 def parse(raw):
+    # CNN 網頁顯示的是捨去小數，不是四捨五入
     fg = raw["fear_and_greed"]
     ts = datetime.fromisoformat(fg["timestamp"].replace("Z", "+00:00")).astimezone(timezone.utc)
     cutoff = ts.timestamp() * 1000 - HISTORY_DAYS * 86400 * 1000
@@ -47,12 +49,12 @@ def parse(raw):
         "fetched_at": now_iso(),
         "last_attempt": now_iso(),
         "last_error": None,
-        "score": round(fg["score"]),
+        "score": math.floor(fg["score"]),
         "rating": fg["rating"],
-        "previous_close": round(fg["previous_close"]),
-        "previous_1_week": round(fg["previous_1_week"]),
-        "previous_1_month": round(fg["previous_1_month"]),
-        "previous_1_year": round(fg["previous_1_year"]),
+        "previous_close": math.floor(fg["previous_close"]),
+        "previous_1_week": math.floor(fg["previous_1_week"]),
+        "previous_1_month": math.floor(fg["previous_1_month"]),
+        "previous_1_year": math.floor(fg["previous_1_year"]),
         "history": history,
     }
 
