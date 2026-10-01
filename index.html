@@ -391,7 +391,7 @@ function lineChart(wrap, rows, { digits = 2, unit = "", avg = null }) {
   svg.addEventListener("pointerleave", () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); });
 }
 
-function barChart(wrap, rows, { digits = 0, unit = "" }) {
+function barChart(wrap, rows, { digits = 0, unit = "", period = "那週" }) {
   const W = 400, H = 120, P = 4;
   const svg = el("svg", { class: "spark", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none" }, wrap);
   const tip = document.createElement("div"); tip.className = "tip"; wrap.appendChild(tip);
@@ -410,7 +410,7 @@ function barChart(wrap, rows, { digits = 0, unit = "" }) {
     const i = Math.max(0, Math.min(rows.length - 1, Math.floor(((e.clientX - box.left) / box.width * W - P) / bw)));
     tip.style.display = "block"; tip.style.left = ((P + (i + .5) * bw) / W * box.width) + "px";
     tip.style.top = (svg.offsetTop + Y(Math.max(rows[i][1], 0)) / H * box.height - 6) + "px";
-    tip.textContent = `${rows[i][0]} 那週　${rows[i][1] > 0 ? "+" : ""}${fmtNum(rows[i][1], digits)} ${unit}`;
+    tip.textContent = `${rows[i][0]} ${period}　${rows[i][1] > 0 ? "+" : ""}${fmtNum(rows[i][1], digits)} ${unit}`;
   };
   svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
   svg.addEventListener("pointerleave", () => { tip.style.display = "none"; });
@@ -445,9 +445,11 @@ async function renderSeries(card) {
     const streak = (() => { let n = 0; const sg = Math.sign(last[2]); for (let i = s.length - 1; i >= 0 && Math.sign(s[i][2]) === sg; i--) n++; return [n, sg]; })();
     body.insertAdjacentHTML("beforeend", `<div class="extra"><span>股票型已經連續 <b>${streak[0]}</b> 週${streak[1] > 0 ? "流入" : "流出"}</span></div>`);
     const wrap = document.createElement("div"); wrap.className = "spark-wrap";
-    wrap.innerHTML = `<h3>近一年每週股票型資金流</h3><div class="legend"><span><i style="background:var(--greed)"></i>流入</span><span><i style="background:var(--fear)"></i>流出</span></div>`;
+    const hist = (d.monthly && d.monthly.length > s.length) ? d.monthly : s;
+    const monthly = hist === d.monthly;
+    wrap.innerHTML = `<h3>${monthly ? "每月" : "每週"}股票型資金流（${hist.slice(-36)[0][0].slice(0, 7)} 起）</h3><div class="legend"><span><i style="background:var(--greed)"></i>流入</span><span><i style="background:var(--fear)"></i>流出</span></div>`;
     body.appendChild(wrap);
-    barChart(wrap, s.slice(-52).map(r => [r[0], toE(r[2])]), { digits: 0, unit });
+    barChart(wrap, hist.slice(-36).map(r => [monthly ? r[0].slice(0, 7) : r[0], toE(r[2])]), { digits: 0, unit, period: monthly ? "那個月" : "那週" });
     return;
   }
 
