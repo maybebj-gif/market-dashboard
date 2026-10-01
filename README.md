@@ -4,7 +4,7 @@
 
 | 卡片 | 資料來源 | 更新方式 |
 |---|---|---|
-| 恐懼與貪婪指數 | CNN Fear & Greed | GitHub Actions 自動抓：台灣平日晚上 7 點～凌晨 1 點每小時一次，加早上 6 點一次，存進 `data/fng.json`；抓不到就保留上次數字並標「尚未更新」 |
+| 恐懼與貪婪指數 | CNN Fear & Greed | GitHub Actions 自動抓：台灣平日晚上 6:55～凌晨 0:55 每小時一次，加早上 5:55 一次，存進 `data/fng.json`；抓不到就保留上次數字並標「尚未更新」 |
 | FedWatch | CME FedWatch | 直接嵌入 CME 的原圖表，隨時是最新的 |
 
 - 手動更新資料：Actions → 「更新指標資料」→ Run workflow
