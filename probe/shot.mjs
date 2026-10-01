@@ -1,23 +1,12 @@
 import { chromium } from 'playwright';
 const b = await chromium.launch();
-const ctx = await b.newContext({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36' });
-const p = await ctx.newPage();
-try {
-  const r = await p.goto('https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics', { timeout: 60000 });
-  await p.waitForTimeout(5000);
-  console.log('FINRA status', r.status(), await p.title());
-  const links = await p.$$eval('a', as => as.map(a => a.href).filter(h => /xlsx?|csv/i.test(h)));
-  console.log('FINRA links', links.slice(0, 10));
-  const t = await p.evaluate(() => document.body.innerText);
-  const i = t.indexOf('Debit'); console.log('FINRA text', t.slice(Math.max(0, i - 300), i + 1500));
-} catch (e) { console.log('FINRA ERR', e.message); }
-try {
-  const p3 = await ctx.newPage();
-  await p3.goto('https://www.schwab.com/investment-research/stax', { timeout: 60000 }); await p3.waitForTimeout(4000);
-  const links = await p3.$$eval('a', as => as.map(a => [a.innerText.trim(), a.href]).filter(([t, h]) => /stax/i.test(t + h)));
-  console.log('STAX links', JSON.stringify(links.slice(0, 15)));
-} catch (e) { console.log('STAX ERR', e.message); }
-const p2 = await b.newPage({ viewport: { width: 390, height: 900 } });
-await p2.goto('https://maybebj-gif.github.io/market-dashboard/'); await p2.waitForTimeout(8000);
-await p2.screenshot({ path: 'probe/site.png', fullPage: true });
+const p = await b.newPage({ viewport: { width: 1200, height: 1600 } });
+const urls = [];
+p.on('response', r => { const u = r.url(); if (/json|api|csv|stax/i.test(u) && !/\.(js|css|png|svg|woff)/.test(u)) urls.push(r.status() + ' ' + u); });
+await p.goto('https://www.schwab.com/investment-research/stax/view-schwab-trading-activity-index', { timeout: 60000 });
+await p.waitForTimeout(8000);
+console.log('STAX XHR', JSON.stringify(urls.slice(0, 40), null, 1));
+const t = await p.evaluate(() => document.body.innerText);
+const i = t.indexOf('STAX'); console.log('STAX TEXT', t.slice(i, i + 2500));
+await p.screenshot({ path: 'probe/stax.png' });
 await b.close();
