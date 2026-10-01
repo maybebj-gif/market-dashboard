@@ -207,13 +207,13 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12p
 
   <section class="card series" id="margin_tw"
     data-file="margin_tw.json" data-title="台灣融資餘額" data-sub="證交所上市股票，每天收盤後公布"
-    data-unit="億元" data-digits="0" data-cmp="20"
+    data-unit="億元" data-digits="0" data-cmp="20" data-cmplabel="一個月前"
     data-how="<b>怎麼看：</b>融資＝借錢買股票。<b>餘額快速下降</b>＝大家在去槓桿、被迫賣，賣壓常在後段；<b>快速上升</b>＝散戶追高、過熱。9/19 記分卡寫亞洲融資「6 月底以來跌超過 10%」，判讀是去風險。"
     data-link="https://www.twse.com.tw/zh/trading/margin/mi-margn.html" data-linktext="證交所原網頁"></section>
 
   <section class="card series" id="margin_jp"
     data-file="margin_jp.json" data-title="日本融資餘額" data-sub="JPX 東京＋名古屋信用交易買殘金額，每週公布一次"
-    data-unit="兆日圓" data-digits="2" data-cmp="1" data-cmplabel="前一週"
+    data-unit="兆日圓" data-digits="3" data-cmp="1" data-cmplabel="前一週"
     data-how="<b>怎麼看：</b>跟台灣一樣，買殘＝借錢買進還沒還的部位。日本散戶槓桿大，餘額大幅下降常出現在急跌後的去槓桿。這張卡每週累積一筆，歷史線會慢慢長出來。"
     data-link="https://www.jpx.co.jp/english/markets/statistics-equities/margin/04.html" data-linktext="JPX 原網頁"></section>
 
@@ -462,11 +462,13 @@ async function renderSeries(card) {
     <span class="chg ${diff > 0 ? "up" : diff < 0 ? "down" : ""}">比${cmpLabel} ${diff > 0 ? "+" : ""}${fmtNum(diff, digits)}（${pct > 0 ? "+" : ""}${pct.toFixed(1)}%）</span></div>`;
   if (o.avg) {
     const rel = last[1] > avg * 1.05 ? "高於平均" : last[1] < avg * 0.95 ? "低於平均" : "接近平均";
-    body.insertAdjacentHTML("beforeend", `<div class="extra"><span>近一年平均 <b>${fmtNum(avg, digits)}</b>（現在${rel}）</span>${s[0].length > 2 ? `<span>個股 Put/Call <b>${fmtNum(last[2], digits)}</b></span>` : ""}</div>`);
+    body.insertAdjacentHTML("beforeend", `<div class="extra"><span>期間平均 <b>${fmtNum(avg, digits)}</b>（現在${rel}）</span>${s[0].length > 2 ? `<span>個股 Put/Call <b>${fmtNum(last[2], digits)}</b></span>` : ""}</div>`);
   }
   if (rows.length >= 2) {
     const wrap = document.createElement("div"); wrap.className = "spark-wrap";
-    wrap.innerHTML = `<h3>${rows.length < 30 ? "目前累積的走勢" : "近一年走勢"}${o.avg ? "（虛線：一年平均）" : ""}</h3>`;
+    const months = Math.round((new Date(rows[rows.length - 1][0]) - new Date(rows[0][0])) / 2.63e9);
+    const span = months >= 11 ? "近一年" : months >= 2 ? `近 ${months} 個月` : "目前累積的";
+    wrap.innerHTML = `<h3>${span}走勢（${rows[0][0]} 起）${o.avg ? "　虛線：平均" : ""}</h3>`;
     body.appendChild(wrap);
     lineChart(wrap, rows, { digits, unit, avg: o.avg ? avg : null });
   }

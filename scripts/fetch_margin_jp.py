@@ -5,7 +5,7 @@ JPX 每週只放最新一份，所以歷史是一週一週累積起來的。
 """
 import io
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import openpyxl
 
@@ -23,14 +23,18 @@ def latest():
     as_of = next(r[0] for r in rows if r and isinstance(r[0], datetime))
     total_idx = next(i for i, r in enumerate(rows) if r and "Total Outstanding Margin Trading" in str(r[0]))
     val_row = rows[total_idx + 1]  # 金額Val. 那一列：[標籤, 賣殘, 前週比, 買殘, 前週比, ...]
-    purchases = float(val_row[3])  # 百萬日圓
-    return [as_of.date().isoformat(), round(purchases / 1e6, 3)]
+    purchases, weekly_change = float(val_row[3]), float(val_row[4])  # 百萬日圓
+    d = as_of.date()
+    # 檔案附了「前週比」，順便推回上一週的數字
+    return [[(d - timedelta(days=7)).isoformat(), round((purchases - weekly_change) / 1e6, 3)],
+            [d.isoformat(), round(purchases / 1e6, 3)]]
 
 
 def update(old):
     rows = {r[0]: r for r in old.get("series", [])}
-    r = latest()
-    rows[r[0]] = r
+    prev, cur = latest()
+    rows.setdefault(prev[0], prev)
+    rows[cur[0]] = cur
     return {"source": "jpx", "unit": "兆日圓", "series": sorted(rows.values())[-260:]}
 
 
