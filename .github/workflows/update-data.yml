@@ -15,6 +15,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,20 +24,25 @@ jobs:
       - run: pip install openpyxl xlrd
       # 每個來源各自獨立：一個失敗不影響其他
       - name: 恐懼與貪婪（CNN）
-        run: python scripts/fetch_fng.py
+        run: python -u scripts/fetch_fng.py
         continue-on-error: true
+        timeout-minutes: 8
       - name: Put/Call（CBOE）
-        run: python scripts/fetch_putcall.py
+        run: python -u scripts/fetch_putcall.py
         continue-on-error: true
+        timeout-minutes: 8
       - name: 基金資金流（ICI）
-        run: python scripts/fetch_fundflows.py
+        run: python -u scripts/fetch_fundflows.py
         continue-on-error: true
+        timeout-minutes: 8
       - name: 台灣融資餘額（證交所）
-        run: python scripts/fetch_margin_tw.py
+        run: python -u scripts/fetch_margin_tw.py
         continue-on-error: true
+        timeout-minutes: 8
       - name: 日本融資餘額（JPX）
-        run: python scripts/fetch_margin_jp.py
+        run: python -u scripts/fetch_margin_jp.py
         continue-on-error: true
+        timeout-minutes: 8
       - name: 有變動就存回倉庫
         run: |
           git config user.name "github-actions[bot]"

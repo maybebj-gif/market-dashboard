@@ -116,8 +116,22 @@ main {
 @media (max-width: 600px) { .embed iframe { height: 600px; } }
 .note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
 
-.card.todo { border-style: dashed; background: transparent; color: var(--text-2); }
-.card.todo ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 14px; }
+.big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-top: 10px; }
+.big .num { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.big .unit { font-size: 14px; color: var(--text-2); }
+.big .chg { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chg.up::before { content: "▲ "; }
+.chg.down::before { content: "▼ "; }
+.extra { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; font-size: 14px; color: var(--text-2); }
+.extra b { color: var(--text); font-variant-numeric: tabular-nums; }
+.how { margin: 12px 0 0; padding: 8px 10px; background: var(--band); border-radius: 8px; font-size: 13px; color: var(--text-2); }
+.how b { color: var(--text); }
+.empty { margin-top: 12px; color: var(--muted); font-size: 14px; }
+.cal iframe { height: 560px; }
+.legend { display: flex; gap: 12px; font-size: 12px; color: var(--text-2); margin: 0 0 4px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.section-title { grid-column: 1 / -1; font-size: 15px; color: var(--text-2); margin: 8px 0 -6px; font-weight: 600; }
+footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -127,6 +141,32 @@ main {
 </header>
 
 <main>
+  <h2 class="section-title">利率與數據：什麼時候會點火</h2>
+  <!-- FedWatch -->
+  <section class="card" id="fedwatch">
+    <h2>FedWatch 降息機率</h2>
+    <p class="sub">CME FedWatch Tool：每次 FOMC 會議的利率結果機率</p>
+    <div class="embed">
+      <iframe src="https://cmegroup-tools.quikstrike.net/User/QuikStrikeView.aspx?viewitemid=IntegratedFedWatchTool"
+              title="CME FedWatch" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <p class="note">CME 的原圖表，可以直接切換會議日期，打開或重新整理網頁就是最新的。</p>
+    <div class="meta">
+      <span class="badge" id="fw-status">嵌入原圖表</span>
+      <a href="https://www.cmegroup.com/cn-t/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME 原網頁</a>
+    </div>
+  </section>
+
+  <!-- 財經日曆 -->
+  <section class="card" id="cal">
+    <h2>財經日曆（美國・高重要性）</h2>
+    <p class="sub">TradingView 經濟日曆，只顯示美國三顆星的數據，公布後會出現實際值</p>
+    <div class="embed cal" id="cal-embed"></div>
+    <p class="how"><b>怎麼用：</b>J Law 的規則是<b>數據公布前不加新倉</b>。重點看 CPI、PPI、非農、FOMC；實際值比預測高或低多少，比數字本身重要。他也說過「最壞的數據出來卻不再創新低＝利空出盡」。</p>
+    <div class="meta"><span class="badge ok">嵌入原圖表</span><span>時間依你的手機時區顯示</span></div>
+  </section>
+
+  <h2 class="section-title">情緒與燃料：場邊的錢多不多</h2>
   <!-- 恐懼與貪婪 -->
   <section class="card" id="fng">
     <h2>恐懼與貪婪指數</h2>
@@ -153,32 +193,43 @@ main {
     </div>
   </section>
 
-  <!-- FedWatch -->
-  <section class="card" id="fedwatch">
-    <h2>FedWatch 降息機率</h2>
-    <p class="sub">CME FedWatch Tool：每次 FOMC 會議的利率結果機率</p>
-    <div class="embed">
-      <iframe src="https://cmegroup-tools.quikstrike.net/User/QuikStrikeView.aspx?viewitemid=IntegratedFedWatchTool"
-              title="CME FedWatch" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
-    <p class="note">CME 的原圖表，可以直接切換會議日期，打開或重新整理網頁就是最新的。</p>
-    <div class="meta">
-      <span class="badge" id="fw-status">嵌入原圖表</span>
-      <a href="https://www.cmegroup.com/cn-t/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME 原網頁</a>
-    </div>
-  </section>
+  <section class="card series" id="putcall"
+    data-file="putcall.json" data-title="Put/Call 比率" data-sub="CBOE 每日全市場選擇權：買權 Put ÷ 賣權 Call 的成交量"
+    data-unit="" data-digits="2" data-avg="1"
+    data-how="<b>怎麼看：</b>大家買 Put（避險）比買 Call 多時比率變高，代表緊張；比率很低代表大家很樂觀、沒在避險。<b>高於平均＝避險多</b>（9/19 記分卡：0.69 高於平均，偏謹慎）。常當反向指標看：極高時常接近短期低點。"
+    data-link="https://www.cboe.com/us/options/market_statistics/daily/" data-linktext="CBOE 原網頁"></section>
 
-  <!-- 預留 -->
-  <section class="card todo">
-    <h2>之後加的卡片</h2>
-    <ul>
-      <li>10 年期美債殖利率（「如果只練兩個」之一）</li>
-      <li>IWM 對 SPY：小型股有沒有跟上大盤（之二）</li>
-      <li>VIX、美元指數、油價</li>
-      <li>NAAIM（每週三）、Polymarket</li>
-    </ul>
+  <section class="card series" id="fundflows"
+    data-file="fundflows.json" data-title="基金資金流（美國）" data-sub="ICI 每週：流進／流出美國股票型共同基金與 ETF 的錢"
+    data-unit="億美元" data-kind="bars"
+    data-how="<b>怎麼看：</b>正值＝錢流進股票基金，負值＝流出。<b>連續幾週流出</b>代表散戶與機構在減碼，錢跑去場邊，轉向時就是燃料。單週數字很吵，看連續方向。"
+    data-link="https://www.ici.org/research/stats/combined_flows" data-linktext="ICI 原網頁"></section>
+
+  <section class="card series" id="margin_tw"
+    data-file="margin_tw.json" data-title="台灣融資餘額" data-sub="證交所上市股票，每天收盤後公布"
+    data-unit="億元" data-digits="0" data-cmp="20"
+    data-how="<b>怎麼看：</b>融資＝借錢買股票。<b>餘額快速下降</b>＝大家在去槓桿、被迫賣，賣壓常在後段；<b>快速上升</b>＝散戶追高、過熱。9/19 記分卡寫亞洲融資「6 月底以來跌超過 10%」，判讀是去風險。"
+    data-link="https://www.twse.com.tw/zh/trading/margin/mi-margn.html" data-linktext="證交所原網頁"></section>
+
+  <section class="card series" id="margin_jp"
+    data-file="margin_jp.json" data-title="日本融資餘額" data-sub="JPX 東京＋名古屋信用交易買殘金額，每週公布一次"
+    data-unit="兆日圓" data-digits="2" data-cmp="1" data-cmplabel="前一週"
+    data-how="<b>怎麼看：</b>跟台灣一樣，買殘＝借錢買進還沒還的部位。日本散戶槓桿大，餘額大幅下降常出現在急跌後的去槓桿。這張卡每週累積一筆，歷史線會慢慢長出來。"
+    data-link="https://www.jpx.co.jp/english/markets/statistics-equities/margin/04.html" data-linktext="JPX 原網頁"></section>
+
+  <!-- STAX -->
+  <section class="card" id="stax">
+    <h2>嘉信散戶指標 STAX</h2>
+    <p class="sub">Schwab Trading Activity Index：用嘉信客戶的實際持倉算出的散戶情緒，每月一次</p>
+    <div class="embed"><iframe src="https://content.schwab.com/web/retail/stax/" title="Schwab STAX" loading="lazy"></iframe></div>
+    <p class="how"><b>怎麼看：</b>分數<b>比上個月高＝散戶更積極</b>，變低＝轉保守。它看的是散戶真的買了什麼，不是問卷，比 AAII 可信。可以當 9/19 記分卡「散戶部位」那一列的近似參考，但不是同一個數字。</p>
+    <p class="note">如果上面是空白或錯誤訊息，代表嘉信不讓別人嵌入，請點下面的原網頁。</p>
+    <div class="meta"><span class="badge ok">嵌入原圖表</span><a href="https://www.schwab.com/investment-research/stax/view-schwab-trading-activity-index" target="_blank" rel="noopener">嘉信原網頁</a></div>
   </section>
 </main>
+<footer>
+  沒放進來的：NAAIM（2026/8 起改成付費訂閱）、FINRA 美國融資餘額（網站擋自動抓取）、高盛避險基金槓桿、德銀部位（主觀型／系統型）、Vanda 散戶（都是投行付費資料）。
+</footer>
 
 <script>
 const RATINGS = {
@@ -308,6 +359,129 @@ function drawStatus(d) {
   t.textContent = `資料時間 ${tw(d.data_time)}`;
 }
 
+
+// ---------- 通用：數字卡（折線或長條） ----------
+const fmtNum = (v, d) => v.toLocaleString("zh-TW", { minimumFractionDigits: d, maximumFractionDigits: d });
+const shortDate = iso => { const [y, m, d] = iso.split("-"); return `${+m}/${+d}`; };
+
+function lineChart(wrap, rows, { digits = 2, unit = "", avg = null }) {
+  const W = 400, H = 120, P = 4;
+  const svg = el("svg", { class: "spark", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none" }, wrap);
+  const tip = document.createElement("div"); tip.className = "tip"; wrap.appendChild(tip);
+  const vs = rows.map(r => r[1]);
+  let lo = Math.min(...vs), hi = Math.max(...vs); const pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad;
+  const X = i => P + i / (rows.length - 1) * (W - 2 * P);
+  const Y = v => P + (1 - (v - lo) / (hi - lo)) * (H - 2 * P);
+  if (avg != null) el("line", { x1: 0, x2: W, y1: Y(avg), y2: Y(avg), stroke: "var(--muted)", "stroke-dasharray": "4 4", "vector-effect": "non-scaling-stroke" }, svg);
+  el("path", {
+    d: rows.map((r, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(r[1]).toFixed(1)}`).join(""),
+    fill: "none", stroke: "var(--line)", "stroke-width": 2, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round",
+  }, svg);
+  const cross = el("line", { y1: 0, y2: H, stroke: "var(--muted)", "vector-effect": "non-scaling-stroke", visibility: "hidden" }, svg);
+  const move = e => {
+    const box = svg.getBoundingClientRect();
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((e.clientX - box.left) / box.width * W - P) / (W - 2 * P) * (rows.length - 1))));
+    const cx = X(i);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
+    tip.style.display = "block"; tip.style.left = (cx / W * box.width) + "px";
+    tip.style.top = (svg.offsetTop + Y(rows[i][1]) / H * box.height - 6) + "px";
+    tip.textContent = `${rows[i][0]}　${fmtNum(rows[i][1], digits)}${unit}`;
+  };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); });
+}
+
+function barChart(wrap, rows, { digits = 0, unit = "" }) {
+  const W = 400, H = 120, P = 4;
+  const svg = el("svg", { class: "spark", viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: "none" }, wrap);
+  const tip = document.createElement("div"); tip.className = "tip"; wrap.appendChild(tip);
+  const m = Math.max(...rows.map(r => Math.abs(r[1]))) || 1;
+  const Y = v => H / 2 - v / m * (H / 2 - P);
+  const bw = (W - 2 * P) / rows.length;
+  el("line", { x1: 0, x2: W, y1: H / 2, y2: H / 2, stroke: "var(--border)", "vector-effect": "non-scaling-stroke" }, svg);
+  rows.forEach((r, i) => {
+    const y0 = Y(Math.max(r[1], 0)), y1 = Y(Math.min(r[1], 0));
+    const b = el("rect", { x: P + i * bw + 1, width: Math.max(bw - 2, 1), y: y0, height: Math.max(y1 - y0, 0.5),
+      fill: r[1] >= 0 ? "var(--greed)" : "var(--fear)" }, svg);
+    b.dataset.i = i;
+  });
+  const move = e => {
+    const box = svg.getBoundingClientRect();
+    const i = Math.max(0, Math.min(rows.length - 1, Math.floor(((e.clientX - box.left) / box.width * W - P) / bw)));
+    tip.style.display = "block"; tip.style.left = ((P + (i + .5) * bw) / W * box.width) + "px";
+    tip.style.top = (svg.offsetTop + Y(Math.max(rows[i][1], 0)) / H * box.height - 6) + "px";
+    tip.textContent = `${rows[i][0]} 那週　${rows[i][1] > 0 ? "+" : ""}${fmtNum(rows[i][1], digits)} ${unit}`;
+  };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", () => { tip.style.display = "none"; });
+}
+
+function statusBadge(meta, d) {
+  const b = document.createElement("span");
+  if (d.status === "ok") { b.className = "badge ok"; b.textContent = "自動更新"; }
+  else { b.className = "badge warn"; b.textContent = "尚未更新（顯示上次資料）"; b.title = d.last_error || ""; }
+  meta.prepend(b);
+}
+
+async function renderSeries(card) {
+  const o = card.dataset;
+  card.innerHTML = `<h2>${o.title}</h2><p class="sub">${o.sub}</p><div class="body"></div>
+    <p class="how">${o.how}</p><div class="meta"><span class="when"></span><a href="${o.link}" target="_blank" rel="noopener">${o.linktext}</a></div>`;
+  const body = card.querySelector(".body"), meta = card.querySelector(".meta");
+  let d;
+  try { d = await (await fetch("data/" + o.file, { cache: "no-cache" })).json(); } catch (e) { d = null; }
+  if (!d || !d.series || !d.series.length) {
+    body.innerHTML = `<p class="empty">還沒有資料，等下一次自動更新（台灣平日晚上每小時一次）。</p>`; return;
+  }
+  const digits = +(o.digits || 0), unit = o.unit || "", s = d.series, last = s[s.length - 1];
+  statusBadge(meta, d);
+  meta.querySelector(".when").textContent = `資料日期 ${last[0]}`;
+
+  if (o.kind === "bars") {  // ICI：[日期, 全部, 股票, 美股, 海外股, 債券]，百萬 → 億美元
+    const toE = v => v / 100;
+    const eq = toE(last[2]);
+    body.innerHTML = `<div class="big"><span class="num">${eq > 0 ? "+" : ""}${fmtNum(eq, 0)}</span><span class="unit">${unit}・股票型（${shortDate(last[0])} 那週）</span></div>
+      <div class="extra"><span>美股 <b>${fmtNum(toE(last[3]), 0)}</b></span><span>海外股 <b>${fmtNum(toE(last[4]), 0)}</b></span><span>債券 <b>${fmtNum(toE(last[5]), 0)}</b></span><span>全部 <b>${fmtNum(toE(last[1]), 0)}</b></span></div>`;
+    const streak = (() => { let n = 0; const sg = Math.sign(last[2]); for (let i = s.length - 1; i >= 0 && Math.sign(s[i][2]) === sg; i--) n++; return [n, sg]; })();
+    body.insertAdjacentHTML("beforeend", `<div class="extra"><span>股票型已經連續 <b>${streak[0]}</b> 週${streak[1] > 0 ? "流入" : "流出"}</span></div>`);
+    const wrap = document.createElement("div"); wrap.className = "spark-wrap";
+    wrap.innerHTML = `<h3>近一年每週股票型資金流</h3><div class="legend"><span><i style="background:var(--greed)"></i>流入</span><span><i style="background:var(--fear)"></i>流出</span></div>`;
+    body.appendChild(wrap);
+    barChart(wrap, s.slice(-52).map(r => [r[0], toE(r[2])]), { digits: 0, unit });
+    return;
+  }
+
+  const rows = s.map(r => [r[0], r[1]]);
+  const cmpN = +(o.cmp || 1), prev = rows[Math.max(0, rows.length - 1 - cmpN)][1];
+  const diff = last[1] - prev, pct = prev ? diff / prev * 100 : 0;
+  const cmpLabel = o.cmplabel || (cmpN === 1 ? "前一天" : `${cmpN} 個交易日前`);
+  const avg = rows.reduce((a, r) => a + r[1], 0) / rows.length;
+  body.innerHTML = `<div class="big"><span class="num">${fmtNum(last[1], digits)}</span><span class="unit">${unit}</span>
+    <span class="chg ${diff > 0 ? "up" : diff < 0 ? "down" : ""}">比${cmpLabel} ${diff > 0 ? "+" : ""}${fmtNum(diff, digits)}（${pct > 0 ? "+" : ""}${pct.toFixed(1)}%）</span></div>`;
+  if (o.avg) {
+    const rel = last[1] > avg * 1.05 ? "高於平均" : last[1] < avg * 0.95 ? "低於平均" : "接近平均";
+    body.insertAdjacentHTML("beforeend", `<div class="extra"><span>近一年平均 <b>${fmtNum(avg, digits)}</b>（現在${rel}）</span>${s[0].length > 2 ? `<span>個股 Put/Call <b>${fmtNum(last[2], digits)}</b></span>` : ""}</div>`);
+  }
+  if (rows.length >= 2) {
+    const wrap = document.createElement("div"); wrap.className = "spark-wrap";
+    wrap.innerHTML = `<h3>${rows.length < 30 ? "目前累積的走勢" : "近一年走勢"}${o.avg ? "（虛線：一年平均）" : ""}</h3>`;
+    body.appendChild(wrap);
+    lineChart(wrap, rows, { digits, unit, avg: o.avg ? avg : null });
+  }
+}
+
+// ---------- 財經日曆（TradingView） ----------
+function loadCalendar() {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light";
+  const box = document.getElementById("cal-embed");
+  box.innerHTML = '<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>';
+  const sc = document.createElement("script");
+  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-events.js"; sc.async = true;
+  sc.textContent = JSON.stringify({ colorTheme: dark ? "dark" : "light", isTransparent: false, width: "100%", height: 560,
+    locale: "zh_TW", importanceFilter: "1", countryFilter: "us" });
+  box.firstChild.appendChild(sc);
+}
+
 async function load() {
   let d;
   try {
@@ -317,6 +491,8 @@ async function load() {
     d = FALLBACK;
   }
   drawGauge(d); drawCompare(d); drawSpark(d.history); drawStatus(d);
+  document.querySelectorAll(".card.series").forEach(renderSeries);
+  loadCalendar();
   document.getElementById("page-time").textContent = `打開時間 ${tw(new Date().toISOString())}（台灣時間）`;
 }
 load();
