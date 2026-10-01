@@ -110,16 +110,6 @@ main {
 .spark { display: block; width: 100%; height: 120px; touch-action: none; }
 .tip { position: absolute; pointer-events: none; background: var(--text); color: var(--surface); font-size: 12px; padding: 3px 7px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -100%); display: none; }
 
-details.shot { margin-top: 12px; }
-details.shot summary { cursor: pointer; color: var(--text-2); font-size: 13px; }
-details.shot img, .shot-img { display: block; width: 100%; max-width: 420px; margin: 8px auto 0; border-radius: 8px; border: 1px solid var(--border); }
-
-.embed { margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #fff; }
-.embed iframe { display: block; width: 100%; height: 720px; border: 0; }
-@media (max-width: 600px) { .embed iframe { height: 600px; } }
-.note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
-.snap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; }
-.snap span { background: var(--band); border-radius: 6px; padding: 3px 8px; }
 
 .card.todo { border-style: dashed; background: transparent; color: var(--text-2); }
 .card.todo ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 14px; }
@@ -151,10 +141,6 @@ details.shot img, .shot-img { display: block; width: 100%; max-width: 420px; mar
       <svg class="spark" id="fng-spark" viewBox="0 0 400 120" preserveAspectRatio="none" aria-label="近一年恐懼與貪婪走勢"></svg>
       <div class="tip" id="fng-tip"></div>
     </div>
-    <details class="shot">
-      <summary>看原始截圖（9/30 收盤）</summary>
-      <img src="img/fng-2026-09-30.png" alt="CNN Fear & Greed 截圖：31 恐懼" loading="lazy">
-    </details>
     <div class="meta">
       <span class="badge" id="fng-status">–</span>
       <span id="fng-time">–</span>
@@ -170,15 +156,7 @@ details.shot img, .shot-img { display: block; width: 100%; max-width: 420px; mar
       <iframe src="https://cmegroup-tools.quikstrike.net/User/QuikStrikeView.aspx?viewitemid=IntegratedFedWatchTool"
               title="CME FedWatch" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
-    <p class="note">上面是 CME 的原圖表，可以直接切換會議日期。如果是空白或出現錯誤，代表 CME 不允許嵌入，請看下面的截圖。</p>
-    <details class="shot" open>
-      <summary>看截圖（10/1 截，10/28 會議）</summary>
-      <img src="img/fedwatch-2026-10-01.png" alt="FedWatch 截圖：10/28 會議 61.8% / 38.2%" loading="lazy">
-      <div class="snap">
-        <span>會議 2026/10/28</span><span>目前利率 375–400</span><span>61.8%</span><span>38.2%</span>
-      </div>
-      <p class="note">截圖當時的資料，不是即時數字。</p>
-    </details>
+    <p class="note">CME 的原圖表，可以直接切換會議日期，打開或重新整理網頁就是最新的。</p>
     <div class="meta">
       <span class="badge" id="fw-status">嵌入原圖表</span>
       <a href="https://www.cmegroup.com/cn-t/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME 原網頁</a>
