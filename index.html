@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>觀察指標儀表板</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f3f2ef;
+  --surface: #fcfcfb;
+  --border: #e2e0da;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --muted: #7d7b75;
+  --band: #e9e7e2;
+  --fear: #eb6834;
+  --fear-soft: #fbe1d6;
+  --greed: #1baf7a;
+  --greed-soft: #d4f1e5;
+  --neutral-mark: #9a988f;
+  --line: #2a78d6;
+  --ok: #008300;
+  --warn: #b57a00;
+  --needle: #1d1d1b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211;
+    --surface: #1a1a19;
+    --border: #2f2e2b;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --muted: #8f8d85;
+    --band: #2a2927;
+    --fear: #d95926;
+    --fear-soft: #4a2617;
+    --greed: #199e70;
+    --greed-soft: #133b2c;
+    --neutral-mark: #8f8d85;
+    --line: #3987e5;
+    --ok: #3fb63f;
+    --warn: #e0a526;
+    --needle: #f2f1ec;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211;
+  --surface: #1a1a19;
+  --border: #2f2e2b;
+  --text: #ffffff;
+  --text-2: #c3c2b7;
+  --muted: #8f8d85;
+  --band: #2a2927;
+  --fear: #d95926;
+  --fear-soft: #4a2617;
+  --greed: #199e70;
+  --greed-soft: #133b2c;
+  --neutral-mark: #8f8d85;
+  --line: #3987e5;
+  --ok: #3fb63f;
+  --warn: #e0a526;
+  --needle: #f2f1ec;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+header { max-width: 1200px; margin: 0 auto; padding: 20px 16px 4px; }
+h1 { font-size: 22px; margin: 0; }
+header p { margin: 4px 0 0; color: var(--text-2); font-size: 13px; }
+main {
+  max-width: 1200px; margin: 0 auto; padding: 12px 16px 40px;
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  align-items: start;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; min-width: 0;
+}
+.card h2 { font-size: 17px; margin: 0; }
+.card .sub { color: var(--text-2); font-size: 13px; margin: 2px 0 0; }
+.meta { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.meta a { color: var(--text-2); }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+.badge.ok { color: var(--ok); }
+.badge.warn { color: var(--warn); }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+.gauge { display: block; width: 100%; max-width: 360px; margin: 8px auto 0; }
+.gauge text { font-family: inherit; }
+.rating { text-align: center; font-size: 15px; font-weight: 600; margin-top: -4px; }
+.compare { list-style: none; margin: 14px 0 0; padding: 0; }
+.compare li { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
+.compare li:last-child { border-bottom: 0; }
+.compare .when { color: var(--text-2); width: 6.5em; flex: none; }
+.compare .lbl { flex: 1; }
+.compare .val { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 2.4em; text-align: center; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--border); }
+.compare .val.fear { background: var(--fear-soft); border-color: var(--fear); }
+.compare .val.greed { background: var(--greed-soft); border-color: var(--greed); }
+
+.spark-wrap { position: relative; margin-top: 14px; }
+.spark-wrap h3 { font-size: 13px; font-weight: 600; color: var(--text-2); margin: 0 0 4px; }
+.spark { display: block; width: 100%; height: 120px; touch-action: none; }
+.tip { position: absolute; pointer-events: none; background: var(--text); color: var(--surface); font-size: 12px; padding: 3px 7px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -100%); display: none; }
+
+details.shot { margin-top: 12px; }
+details.shot summary { cursor: pointer; color: var(--text-2); font-size: 13px; }
+details.shot img, .shot-img { display: block; width: 100%; max-width: 420px; margin: 8px auto 0; border-radius: 8px; border: 1px solid var(--border); }
+
+.embed { margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #fff; }
+.embed iframe { display: block; width: 100%; height: 720px; border: 0; }
+@media (max-width: 600px) { .embed iframe { height: 600px; } }
+.note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.snap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; }
+.snap span { background: var(--band); border-radius: 6px; padding: 3px 8px; }
+
+.card.todo { border-style: dashed; background: transparent; color: var(--text-2); }
+.card.todo ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>觀察指標儀表板</h1>
+  <p id="page-time">時間以台灣時間顯示</p>
+</header>
+
+<main>
+  <!-- 恐懼與貪婪 -->
+  <section class="card" id="fng">
+    <h2>恐懼與貪婪指數</h2>
+    <p class="sub">CNN Fear &amp; Greed Index</p>
+    <svg class="gauge" viewBox="0 0 300 175" role="img" aria-labelledby="fng-gauge-title">
+      <title id="fng-gauge-title">恐懼與貪婪儀表</title>
+      <g id="fng-bands"></g>
+      <g id="fng-ticks"></g>
+      <line id="fng-needle" x1="150" y1="150" x2="150" y2="40" stroke="var(--needle)" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="150" cy="150" r="30" fill="var(--surface)"/>
+      <text id="fng-score" x="150" y="163" text-anchor="middle" font-size="34" font-weight="700" fill="var(--text)">–</text>
+    </svg>
+    <div class="rating" id="fng-rating">–</div>
+    <ul class="compare" id="fng-compare"></ul>
+    <div class="spark-wrap" id="fng-spark-wrap" hidden>
+      <h3>近一年走勢（虛線：25 恐懼／75 貪婪）</h3>
+      <svg class="spark" id="fng-spark" viewBox="0 0 400 120" preserveAspectRatio="none" aria-label="近一年恐懼與貪婪走勢"></svg>
+      <div class="tip" id="fng-tip"></div>
+    </div>
+    <details class="shot">
+      <summary>看原始截圖（9/30 收盤）</summary>
+      <img src="img/fng-2026-09-30.png" alt="CNN Fear & Greed 截圖：31 恐懼" loading="lazy">
+    </details>
+    <div class="meta">
+      <span class="badge" id="fng-status">–</span>
+      <span id="fng-time">–</span>
+      <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener">CNN 原網頁</a>
+    </div>
+  </section>
+
+  <!-- FedWatch -->
+  <section class="card" id="fedwatch">
+    <h2>FedWatch 降息機率</h2>
+    <p class="sub">CME FedWatch Tool：每次 FOMC 會議的利率結果機率</p>
+    <div class="embed">
+      <iframe src="https://cmegroup-tools.quikstrike.net/User/QuikStrikeView.aspx?viewitemid=IntegratedFedWatchTool"
+              title="CME FedWatch" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <p class="note">上面是 CME 的原圖表，可以直接切換會議日期。如果是空白或出現錯誤，代表 CME 不允許嵌入，請看下面的截圖。</p>
+    <details class="shot" open>
+      <summary>看截圖（10/1 截，10/28 會議）</summary>
+      <img src="img/fedwatch-2026-10-01.png" alt="FedWatch 截圖：10/28 會議 61.8% / 38.2%" loading="lazy">
+      <div class="snap">
+        <span>會議 2026/10/28</span><span>目前利率 375–400</span><span>61.8%</span><span>38.2%</span>
+      </div>
+      <p class="note">截圖當時的資料，不是即時數字。</p>
+    </details>
+    <div class="meta">
+      <span class="badge" id="fw-status">嵌入原圖表</span>
+      <a href="https://www.cmegroup.com/cn-t/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME 原網頁</a>
+    </div>
+  </section>
+
+  <!-- 預留 -->
+  <section class="card todo">
+    <h2>之後加的卡片</h2>
+    <ul>
+      <li>10 年期美債殖利率（「如果只練兩個」之一）</li>
+      <li>IWM 對 SPY：小型股有沒有跟上大盤（之二）</li>
+      <li>VIX、美元指數、油價</li>
+      <li>NAAIM（每週三）、Polymarket</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+const RATINGS = {
+  "extreme fear": "極度恐懼", "fear": "恐懼", "neutral": "中性",
+  "greed": "貪婪", "extreme greed": "極度貪婪",
+};
+// CNN 的分區
+const BANDS = [
+  [0, 25, "extreme fear"], [25, 45, "fear"], [45, 55, "neutral"],
+  [55, 75, "greed"], [75, 100, "extreme greed"],
+];
+const FALLBACK = {
+  source: "screenshot", status: "manual", data_time: "2026-09-30T23:59:50Z",
+  score: 31, rating: "fear", previous_close: 31, previous_1_week: 32,
+  previous_1_month: 53, previous_1_year: 51, history: [],
+};
+
+const tw = (iso, withTime = true) => new Date(iso).toLocaleString("zh-TW", {
+  timeZone: "Asia/Taipei", month: "numeric", day: "numeric",
+  ...(withTime ? { hour: "2-digit", minute: "2-digit", hour12: false } : {}),
+});
+const ratingOf = v => (BANDS.find(([a, b]) => v >= a && v < b) || BANDS[4])[2];
+const sideOf = r => r.includes("fear") ? "fear" : r.includes("greed") ? "greed" : "neutral";
+
+function pt(v, r) {
+  const a = Math.PI * (1 - v / 100);
+  return [150 + r * Math.cos(a), 150 - r * Math.sin(a)];
+}
+function arc(v0, v1, r0, r1) {
+  const [x0, y0] = pt(v0, r1), [x1, y1] = pt(v1, r1);
+  const [x2, y2] = pt(v1, r0), [x3, y3] = pt(v0, r0);
+  return `M${x0},${y0} A${r1},${r1} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z`;
+}
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  parent && parent.appendChild(n);
+  return n;
+}
+
+function drawGauge(d) {
+  const bands = document.getElementById("fng-bands");
+  const active = ratingOf(d.score);
+  BANDS.forEach(([a, b, name]) => {
+    const on = name === active, side = sideOf(name);
+    el("path", {
+      d: arc(a + 0.6, b - 0.6, 92, 140),
+      fill: on ? `var(--${side === "neutral" ? "band" : side + "-soft"})` : "var(--band)",
+      stroke: on ? `var(--${side === "neutral" ? "neutral-mark" : side})` : "none",
+      "stroke-width": 1.5,
+    }, bands);
+    const [tx, ty] = pt((a + b) / 2, 116);
+    const t = el("text", {
+      x: tx, y: ty + 4, "text-anchor": "middle", "font-size": 10.5,
+      "font-weight": on ? 700 : 500, fill: on ? "var(--text)" : "var(--muted)",
+    }, bands);
+    t.textContent = RATINGS[name];
+  });
+  const ticks = document.getElementById("fng-ticks");
+  [0, 25, 50, 75, 100].forEach(v => {
+    const [x, y] = pt(v, 80);
+    el("text", { x, y: y + 4, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, ticks).textContent = v;
+  });
+  const [nx, ny] = pt(d.score, 104);
+  const needle = document.getElementById("fng-needle");
+  needle.setAttribute("x2", nx); needle.setAttribute("y2", ny);
+  document.getElementById("fng-score").textContent = d.score;
+  document.getElementById("fng-rating").textContent = `${RATINGS[d.rating] || d.rating}　${d.rating.replace(/\b\w/g, c => c.toUpperCase())}`;
+}
+
+function drawCompare(d) {
+  const rows = [
+    ["前一日收盤", d.previous_close], ["一週前", d.previous_1_week],
+    ["一個月前", d.previous_1_month], ["一年前", d.previous_1_year],
+  ];
+  document.getElementById("fng-compare").innerHTML = rows.map(([when, v]) => {
+    const r = ratingOf(v), s = sideOf(r);
+    return `<li><span class="when">${when}</span><span class="lbl">${RATINGS[r]}</span><span class="val ${s}">${v}</span></li>`;
+  }).join("");
+}
+
+function drawSpark(hist) {
+  if (!hist || hist.length < 2) return;
+  document.getElementById("fng-spark-wrap").hidden = false;
+  const svg = document.getElementById("fng-spark"), tip = document.getElementById("fng-tip");
+  const W = 400, H = 120, P = 4;
+  const x0 = hist[0][0], x1 = hist[hist.length - 1][0];
+  const X = t => P + (t - x0) / (x1 - x0) * (W - 2 * P);
+  const Y = v => P + (1 - v / 100) * (H - 2 * P);
+  [25, 75].forEach(v => el("line", { x1: 0, x2: W, y1: Y(v), y2: Y(v), stroke: "var(--border)", "stroke-dasharray": "4 4", "vector-effect": "non-scaling-stroke" }, svg));
+  el("path", {
+    d: hist.map(([t, v], i) => `${i ? "L" : "M"}${X(t).toFixed(1)},${Y(v).toFixed(1)}`).join(""),
+    fill: "none", stroke: "var(--line)", "stroke-width": 2, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round",
+  }, svg);
+  const cross = el("line", { y1: 0, y2: H, stroke: "var(--muted)", "vector-effect": "non-scaling-stroke", visibility: "hidden" }, svg);
+  const move = e => {
+    const box = svg.getBoundingClientRect();
+    const t = x0 + ((e.clientX - box.left) / box.width * W - P) / (W - 2 * P) * (x1 - x0);
+    let best = hist[0];
+    for (const p of hist) if (Math.abs(p[0] - t) < Math.abs(best[0] - t)) best = p;
+    const cx = X(best[0]);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    tip.style.left = (cx / W * box.width) + "px";
+    tip.style.top = (svg.offsetTop + Y(best[1]) / H * box.height - 6) + "px";
+    tip.textContent = `${tw(new Date(best[0]).toISOString(), false)}　${Math.round(best[1])} ${RATINGS[ratingOf(best[1])]}`;
+  };
+  const leave = () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", leave);
+}
+
+function drawStatus(d) {
+  const s = document.getElementById("fng-status"), t = document.getElementById("fng-time");
+  if (d.source === "cnn" && d.status === "ok") {
+    s.className = "badge ok"; s.textContent = "自動更新";
+  } else if (d.source === "cnn") {
+    s.className = "badge warn"; s.textContent = "尚未更新（顯示上次資料）";
+    s.title = d.last_error || "";
+  } else {
+    s.className = "badge warn"; s.textContent = "手動輸入（來自截圖）";
+  }
+  t.textContent = `資料時間 ${tw(d.data_time)}`;
+}
+
+async function load() {
+  let d;
+  try {
+    const r = await fetch("data/fng.json", { cache: "no-cache" });
+    d = await r.json();
+  } catch (e) {
+    d = FALLBACK;
+  }
+  drawGauge(d); drawCompare(d); drawSpark(d.history); drawStatus(d);
+  document.getElementById("page-time").textContent = `打開時間 ${tw(new Date().toISOString())}（台灣時間）`;
+}
+load();
+</script>
+</body>
+</html>
