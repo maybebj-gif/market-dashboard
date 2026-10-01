@@ -1,12 +1,7 @@
 import { chromium } from 'playwright';
 const b = await chromium.launch();
-const p = await b.newPage({ viewport: { width: 1200, height: 1600 } });
-const urls = [];
-p.on('response', r => { const u = r.url(); if (/json|api|csv|stax/i.test(u) && !/\.(js|css|png|svg|woff)/.test(u)) urls.push(r.status() + ' ' + u); });
-await p.goto('https://www.schwab.com/investment-research/stax/view-schwab-trading-activity-index', { timeout: 60000 });
-await p.waitForTimeout(8000);
-console.log('STAX XHR', JSON.stringify(urls.slice(0, 40), null, 1));
-const t = await p.evaluate(() => document.body.innerText);
-const i = t.indexOf('STAX'); console.log('STAX TEXT', t.slice(i, i + 2500));
-await p.screenshot({ path: 'probe/stax.png' });
+const p = await b.newPage({ viewport: { width: 390, height: 900 } });
+await new Promise(r => setTimeout(r, 30000));  // 等 Pages 部署
+await p.goto('https://maybebj-gif.github.io/market-dashboard/?v=' + Date.now()); await p.waitForTimeout(12000);
+for (const id of ['cal', 'stax', 'fundflows']) await (await p.$('#' + id)).screenshot({ path: 'probe/live-' + id + '.png' });
 await b.close();
