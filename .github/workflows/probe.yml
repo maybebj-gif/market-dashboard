@@ -2,9 +2,18 @@ name: probe
 on:
   push:
     branches: [probe]
+permissions:
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python probe/probe.py
+      - run: pip install openpyxl
+      - run: python probe/probe2.py
+      - run: |
+          npm i playwright@1 >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1
+          (python -m http.server 8000 &) ; sleep 2
+          node probe/shot.mjs
+          git config user.name bot; git config user.email bot@x
+          git add probe/*.png; git commit -m "probe shots [skip ci]"; git push
