@@ -7,7 +7,7 @@
 | 卡片 | 資料來源 | 做法 | 更新頻率 |
 |---|---|---|---|
 | FedWatch | CME | 嵌入原圖表 | 即時 |
-| 財經日曆（美國・高重要性） | TradingView | 嵌入原工具 | 即時 |
+| 財經日曆（美國・高重要性） | Investing.com（中文） | 嵌入原工具 | 即時 |
 | 恐懼與貪婪 | CNN | `scripts/fetch_fng.py` | 每天 |
 | Put/Call 比率 | CBOE | `scripts/fetch_putcall.py` | 每天 |
 | 基金資金流 | ICI | `scripts/fetch_fundflows.py` | 每週（另存每月歷史） |

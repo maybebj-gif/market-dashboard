@@ -186,10 +186,10 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12p
   <!-- 財經日曆 -->
   <section class="card" id="cal">
     <h2>財經日曆（美國・高重要性）</h2>
-    <p class="sub">TradingView 經濟日曆，只顯示美國三顆星的數據，公布後會出現實際值</p>
-    <div class="embed cal" id="cal-embed"></div>
+    <p class="sub">Investing.com 中文財經日曆，只顯示美國三顆星的數據，公布後會出現實際值；點項目可看 Investing 的說明</p>
+    <div class="embed cal"><iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=3&features=datepicker,timezone&countries=5&calType=day&timeZone=28&lang=55" title="Investing.com 財經日曆" loading="lazy"></iframe></div>
     <p class="how"><b>怎麼用：</b>J Law 的規則是<b>數據公布前不加新倉</b>。重點看 CPI、PPI、非農、FOMC；實際值比預測高或低多少，比數字本身重要。他也說過「最壞的數據出來卻不再創新低＝利空出盡」。</p>
-    <div class="meta"><span class="badge ok">嵌入原圖表</span><span>時間依你的手機時區顯示</span></div>
+    <div class="meta"><span class="badge ok">嵌入原圖表</span><span>台北時間</span><span>財經日曆由 <a href="https://hk.investing.com/economic-calendar/" target="_blank" rel="noopener">Investing.com</a> 提供</span></div>
   </section>
 
   <h2 class="section-title">情緒與燃料：場邊的錢多不多</h2>
@@ -474,17 +474,6 @@ async function renderSeries(card) {
   }
 }
 
-// ---------- 財經日曆（TradingView） ----------
-function loadCalendar() {
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light";
-  const box = document.getElementById("cal-embed");
-  box.innerHTML = '<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>';
-  const sc = document.createElement("script");
-  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-events.js"; sc.async = true;
-  sc.textContent = JSON.stringify({ colorTheme: dark ? "dark" : "light", isTransparent: false, width: "100%", height: 560,
-    locale: "zh_TW", importanceFilter: "1", countryFilter: "us" });
-  box.firstChild.appendChild(sc);
-}
 
 async function load() {
   let d;
@@ -496,7 +485,6 @@ async function load() {
   }
   drawGauge(d); drawCompare(d); drawSpark(d.history); drawStatus(d);
   document.querySelectorAll(".card.series").forEach(renderSeries);
-  loadCalendar();
   document.getElementById("page-time").textContent = `打開時間 ${tw(new Date().toISOString())}（台灣時間）`;
 }
 load();
