@@ -1,33 +1,16 @@
-import re, io, urllib.request
-H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.9",
-     "Sec-Fetch-Dest": "document", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-Site": "none", "Upgrade-Insecure-Requests": "1"}
-def get(url):
+import re, urllib.request
+H = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+     "Accept": "text/html", "Accept-Language": "zh-TW,zh;q=0.9", "Referer": "https://maybebj-gif.github.io/"}
+base = "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=3&features=datepicker,timezone&countries=5&calType=day&timeZone=8&lang={}"
+for lang in [1, 6, 46, 55]:
+    print("\n#### lang", lang)
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=H), timeout=40) as r:
-            b = r.read(); print("STATUS", r.status, r.headers.get("content-type"), len(b)); return b
+        with urllib.request.urlopen(urllib.request.Request(base.format(lang), headers=H), timeout=30) as r:
+            b = r.read().decode("utf-8", "replace"); print("STATUS", r.status, len(b), "XFO", r.headers.get("x-frame-options"), "CSP", (r.headers.get("content-security-policy") or "")[:200])
     except Exception as e:
-        print("ERR", type(e).__name__, str(e)[:150]); return None
-print("#### ici xls")
-b = get("https://www.ici.org/combined_flows_data_2026.xls")
-if b:
-    print("MAGIC", b[:8])
-    try:
-        import xlrd
-        wb = xlrd.open_workbook(file_contents=b)
-        for sh in wb.sheets()[:3]:
-            print("SHEET", sh.name, sh.nrows, sh.ncols)
-            for r in list(range(min(sh.nrows, 14))) + list(range(max(14, sh.nrows - 6), sh.nrows)):
-                print(" ", r, [c for c in sh.row_values(r) if c != ""][:16])
-    except Exception as e:
-        print("XLRD ERR", e); print(b[:1500])
-print("\n#### stax view")
-b = get("https://www.schwab.com/investment-research/stax/view-schwab-trading-activity-index")
-if b:
-    s = b.decode("utf-8","replace")
-    t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", s, flags=re.S)))
-    for m in list(re.finditer(r"STAX", t))[:8]: print(" ..", t[max(0,m.start()-150):m.start()+300])
-    print("NUMS", re.findall(r"\b\d\.\d{2}\b", t)[:30])
-    print("SCRIPT-DATA", re.findall(r'(?:stax|STAX)[^"]{0,40}"\s*:\s*"?[\d.]+', s)[:10])
-    print("URLS", sorted(set(u for u in re.findall(r'https?://[^"\'\s<>]+', s) if any(k in u.lower() for k in ["stax","json","api","csv","tableau","chart"])))[:30])
-    print("IFRAMES", re.findall(r'<iframe[^>]+src="([^"]+)"', s))
+        print("ERR", e); continue
+    t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", b, flags=re.S)))
+    print("TEXT", t[:700])
+    opts = re.findall(r'<option[^>]*value="(\d+)"[^>]*>([^<]+)</option>', b)
+    print("TZ", [o for o in opts if "+8" in o[1] or "+08" in o[1] or "Taipei" in o[1] or "台北" in o[1] or "北京" in o[1]][:10], len(opts))
+    if lang == 46: print("LINKS", re.findall(r'href="([^"]+)"', b)[:15])
