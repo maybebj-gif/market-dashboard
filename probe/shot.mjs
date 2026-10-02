@@ -4,7 +4,7 @@ const p = await b.newPage({ viewport: { width: 390, height: 900 }, userAgent: 'M
 const out = [];
 for (let lang = 1; lang <= 60; lang++) {
   try {
-    await p.goto('http://localhost:8000/probe/widget.html#' + lang); await p.waitForTimeout(3500);
+    await p.goto('http://localhost:8000/probe/widget.html?lang=' + lang); await p.waitForTimeout(3500);
     const f = p.frames().find(x => x.url().includes('investing'));
     const t = f ? (await f.evaluate(() => document.body.innerText)).replace(/\s+/g, ' ') : 'NOFRAME';
     const cjk = /[一-鿿]/.test(t);
