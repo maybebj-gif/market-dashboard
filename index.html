@@ -131,6 +131,10 @@ main {
 .legend { display: flex; gap: 12px; font-size: 12px; color: var(--text-2); margin: 0 0 4px; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .section-title { grid-column: 1 / -1; font-size: 15px; color: var(--text-2); margin: 8px 0 -6px; font-weight: 600; }
+.prompt { margin: 10px 0 0; padding: 12px; background: var(--band); border-radius: 8px; font-size: 13.5px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow: auto; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.btn { appearance: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; border-radius: 8px; cursor: pointer; text-decoration: none; }
+.btn.primary { background: var(--text); color: var(--surface); border-color: var(--text); }
 footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12px; color: var(--muted); }
 </style>
 </head>
@@ -186,8 +190,8 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12p
   <!-- 財經日曆 -->
   <section class="card" id="cal">
     <h2>財經日曆（美國・高重要性）</h2>
-    <p class="sub">Investing.com 中文財經日曆，只顯示美國三顆星的數據，公布後會出現實際值；點項目可看 Investing 的說明</p>
-    <div class="embed cal"><iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=3&features=datepicker,timezone&countries=5&calType=day&timeZone=28&lang=55" title="Investing.com 財經日曆" loading="lazy"></iframe></div>
+    <p class="sub">Investing.com 中文財經日曆（本週），只顯示美國三顆星的數據，公布後會出現實際值；點項目可看 Investing 的說明</p>
+    <div class="embed cal"><iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=3&features=datepicker,timezone&countries=5&calType=week&timeZone=28&lang=55" title="Investing.com 財經日曆" loading="lazy"></iframe></div>
     <p class="how"><b>怎麼用：</b>J Law 的規則是<b>數據公布前不加新倉</b>。重點看 CPI、PPI、非農、FOMC；實際值比預測高或低多少，比數字本身重要。他也說過「最壞的數據出來卻不再創新低＝利空出盡」。</p>
     <div class="meta"><span class="badge ok">嵌入原圖表</span><span>台北時間</span><span>財經日曆由 <a href="https://hk.investing.com/economic-calendar/" target="_blank" rel="noopener">Investing.com</a> 提供</span></div>
   </section>
@@ -226,9 +230,41 @@ footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; font-size: 12p
     <p class="note">如果上面是空白或錯誤訊息，代表嘉信不讓別人嵌入，請點下面的原網頁。</p>
     <div class="meta"><span class="badge ok">嵌入原圖表</span><a href="https://www.schwab.com/investment-research/stax/view-schwab-trading-activity-index" target="_blank" rel="noopener">嘉信原網頁</a></div>
   </section>
+
+  <h2 class="section-title">付費指標：想到就問 Grok</h2>
+  <section class="card" id="grok">
+    <h2>問 Grok 的提示詞</h2>
+    <p class="sub">NAAIM、高盛、德銀、Vanda 是付費資料，美國與韓國融資餘額抓不到，但常有人在 X 和新聞上轉述。複製下面這段貼給 Grok 就好。</p>
+    <div class="prompt" id="grok-prompt">請幫我查以下市場部位指標的「最新一期」數字。優先找 X（Twitter）上的原始貼文，或彭博、路透、CNBC 的報導：
+
+1. NAAIM Exposure Index（美國主動型經理人持股比例，每週三公布）
+2. 高盛 Prime Book 的避險基金淨槓桿（Net leverage）與總槓桿（Gross leverage）
+3. 德意志銀行部位報告：主觀型投資人（Discretionary）與系統型策略（Systematic）的股票部位
+4. Vanda Research 的散戶資金流／散戶部位
+5. FINRA 美國融資餘額（Margin debt，每月公布）
+6. 韓國融資餘額（KOFIA 信用融資餘額）
+
+每一項請列出：
+・最新數字
+・資料日期（是哪一週或哪一天的數字）
+・跟上一期比的變化
+・跟過去一兩年比，算偏高、偏低還是普通
+・來源連結
+
+找不到最新數字的，請直接寫「找不到」，不要用舊資料或推估代替。
+
+最後用兩三句話總結：整體來看，機構和散戶現在是在加碼還是減碼？場邊的資金多不多？
+
+請用繁體中文回答，用表格整理。</div>
+    <div class="btns">
+      <button class="btn primary" id="grok-copy" type="button">複製提示詞</button>
+      <a class="btn" href="https://grok.com/" target="_blank" rel="noopener">打開 Grok</a>
+    </div>
+    <p class="how"><b>怎麼用：</b>Grok 給的數字一定要點來源確認日期，轉述常常是舊的。這些指標都是「燃料有沒有」，不是「什麼時候點火」，跟 J Law 9/19 的用法一樣：看機構和散戶是不是都已經減碼。</p>
+  </section>
 </main>
 <footer>
-  沒放進來的：NAAIM（2026/8 起改成付費訂閱）、FINRA 美國融資餘額（網站擋自動抓取）、高盛避險基金槓桿、德銀部位（主觀型／系統型）、Vanda 散戶（都是投行付費資料）。
+  沒有自動抓的：NAAIM（2026/8 起改成付費訂閱）、FINRA 美國融資餘額（網站擋自動抓取）、韓國融資餘額、高盛避險基金槓桿、德銀部位、Vanda 散戶（投行付費資料）——都放在上面的 Grok 提示詞裡。
 </footer>
 
 <script>
@@ -474,6 +510,16 @@ async function renderSeries(card) {
   }
 }
 
+
+document.getElementById("grok-copy").addEventListener("click", async e => {
+  const text = document.getElementById("grok-prompt").innerText;
+  try { await navigator.clipboard.writeText(text); }
+  catch (err) {
+    const r = document.createRange(); r.selectNodeContents(document.getElementById("grok-prompt"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand("copy");
+  }
+  e.target.textContent = "已複製 ✓"; setTimeout(() => e.target.textContent = "複製提示詞", 2000);
+});
 
 async function load() {
   let d;
