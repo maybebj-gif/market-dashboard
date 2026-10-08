@@ -1,9 +1,9 @@
 {
   "source": "cnn",
   "status": "ok",
-  "data_time": "2026-10-08T11:43:01Z",
-  "fetched_at": "2026-10-08T12:03:16Z",
-  "last_attempt": "2026-10-08T12:03:16Z",
+  "data_time": "2026-10-08T12:48:16Z",
+  "fetched_at": "2026-10-08T13:08:29Z",
+  "last_attempt": "2026-10-08T13:08:29Z",
   "last_error": null,
   "score": 44.7,
   "rating": "fear",
@@ -1017,7 +1017,7 @@
       44.7
     ],
     [
-      1791459781000,
+      1791463696000,
       44.7
     ]
   ]
