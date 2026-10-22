@@ -1,21 +1,17 @@
 {
   "source": "cnn",
   "status": "ok",
-  "data_time": "2026-10-21T21:56:45Z",
-  "fetched_at": "2026-10-21T22:14:47Z",
-  "last_attempt": "2026-10-21T22:14:47Z",
+  "data_time": "2026-10-22T10:59:16Z",
+  "fetched_at": "2026-10-22T11:18:19Z",
+  "last_attempt": "2026-10-22T11:18:19Z",
   "last_error": null,
-  "score": 31.4,
+  "score": 29.3,
   "rating": "fear",
-  "previous_close": 27.2,
-  "previous_1_week": 26.7,
-  "previous_1_month": 34.2,
-  "previous_1_year": 28.5,
+  "previous_close": 31.4,
+  "previous_1_week": 30.3,
+  "previous_1_month": 35.0,
+  "previous_1_year": 26.4,
   "history": [
-    [
-      1761004800000,
-      28.5
-    ],
     [
       1761091200000,
       26.4
@@ -1014,11 +1010,15 @@
     ],
     [
       1792540800000,
-      31.4
+      29.3
     ],
     [
-      1792619805000,
-      31.4
+      1792627200000,
+      29.3
+    ],
+    [
+      1792666756000,
+      29.3
     ]
   ]
 }
