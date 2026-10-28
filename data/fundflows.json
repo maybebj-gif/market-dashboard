@@ -319,6 +319,6 @@
  ],
  "status": "stale",
  "fetched_at": "2026-10-22T22:15:20Z",
- "last_attempt": "2026-10-28T13:42:21Z",
+ "last_attempt": "2026-10-28T14:38:06Z",
  "last_error": "HTTPError: HTTP Error 403: Forbidden"
 }
